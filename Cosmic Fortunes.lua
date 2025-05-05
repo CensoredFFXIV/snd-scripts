@@ -68,13 +68,13 @@ end
 if not IsAddonVisible("WKSLottery") then
     -- Thanks to pot0to for some of this script
 
-    repeat
+    while GetDistanceToPoint(npc.x, npc.y, npc.z) > 3 do
         if not PathfindInProgress() and not PathIsRunning() then
             PathfindAndMoveTo(npc.x, npc.y, npc.z)
         end
 
         yield("/wait 1")
-    until GetDistanceToPoint(npc.x, npc.y, npc.z) > 0
+    end
 
     if PathfindInProgress() or PathIsRunning() then
         yield("/vnav stop")
@@ -84,9 +84,9 @@ if not IsAddonVisible("WKSLottery") then
     yield("/wait 0.5")
     yield("/interact")
 
-    repeat
+    while not IsAddonVisible("SelectString") do
         yield("/wait 0.5")
-    until IsAddonVisible("SelectString")
+    end
 
     yield("/wait 0.5")
     yield("/callback SelectString true 0")
@@ -94,44 +94,39 @@ if not IsAddonVisible("WKSLottery") then
     yield("/callback SelectString true 0")
 end
 
-while GetItemCount(45691) >= 1000 do
-    if IsAddonVisible("SelectYesno") then
-        yield("/callback SelectYesno true 0")
-    end
+-- while GetItemCount(45691) >= 1000 do
+yield("/wait 1")
 
-    yield("/wait 1")
+itemsInFirstWheel = {}
+itemsInSecondWheel = {}
 
-    itemsInFirstWheel = {}
-    itemsInSecondWheel = {}
+getNames()
 
-    getNames()
+local totalWeightFirstWheel = calculateTotalWeight(itemsInFirstWheel)
+local totalWeightSecondWheel = calculateTotalWeight(itemsInSecondWheel)
 
-    local totalWeightFirstWheel = calculateTotalWeight(itemsInFirstWheel)
-    local totalWeightSecondWheel = calculateTotalWeight(itemsInSecondWheel)
+yield("/callback WKSLottery true 0 0")
+yield("/wait 1")
 
-    yield("/callback WKSLottery true 0 0")
-
-    if totalWeightFirstWheel > totalWeightSecondWheel then
-        yield("First wheel is better with total weight: " .. totalWeightFirstWheel)
-        yield("/callback WKSLottery true 1 0")
-    elseif totalWeightSecondWheel > totalWeightFirstWheel then
-        yield("Second wheel is better with total weight: " .. totalWeightSecondWheel)
-        yield("/callback WKSLottery true 1 1")
-    else
-        yield("Both wheels are equal in weight.")
-        yield("/callback WKSLottery true 1 0")
-    end
-
-    yield("/wait 1")
-    yield("/callback WKSLottery true 2 0")
-    yield("/wait 1")
-
-    if IsNodeVisible("WKSLottery", 1, 27) then
-        yield("Stellar Fortune, needs manual")
-
-        repeat
-            yield("/wait 1")
-        until not IsNodeVisible("WKSLottery", 1, 27)
-        -- yield("/callback WKSLottery true 2 0")
-    end
+if totalWeightFirstWheel > totalWeightSecondWheel then
+    yield("First wheel is better with total weight: " .. totalWeightFirstWheel)
+    yield("/callback WKSLottery true 1 0")
+elseif totalWeightSecondWheel > totalWeightFirstWheel then
+    yield("Second wheel is better with total weight: " .. totalWeightSecondWheel)
+    yield("/callback WKSLottery true 1 1")
+else
+    yield("Both wheels are equal in weight.")
+    yield("/callback WKSLottery true 1 0")
 end
+
+yield("/wait 1")
+yield("/callback WKSLottery true 2 0")
+yield("/wait 1")
+yield("/callback WKSLottery true 0 0")
+yield("/wait 1")
+yield("/callback WKSLottery true 1 0")
+
+if IsAddonVisible("SelectYesno") then
+    yield("/callback SelectYesno true 0")
+end
+-- end
