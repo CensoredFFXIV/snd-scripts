@@ -77,10 +77,17 @@ if not IsAddonVisible("WKSLottery") then
 
     while GetDistanceToPoint(npc.x, npc.y, npc.z) > 3 do
         if not PathfindInProgress() and not PathIsRunning() then
-            PathfindAndMoveTo(npc.x, npc.y, npc.z)
+            -- Thanks to Aliwen
+            if GetDistanceToPoint(npc.x, npc.y, npc.z) > 80 then
+                yield('/ac "Duty Action I"')
+            else
+                PathfindAndMoveTo(npc.x, npc.y, npc.z)
+            end
         end
 
-        yield("/wait 1")
+        repeat
+            yield("/wait 1")
+        until IsPlayerAvailable()
     end
 
     if PathfindInProgress() or PathIsRunning() then
