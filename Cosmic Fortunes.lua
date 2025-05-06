@@ -111,7 +111,7 @@ while GetItemCount(45691) >= 1000 or IsAddonVisible("WKSLottery") do
         yield("/wait 0.5")
     until IsNodeVisible("WKSLottery", 1, 30) and IsNodeVisible("WKSLottery", 1, 40)
 
-    yield("/wait 2")
+    yield("/wait 1")
 
     local weightFirstWheel, weightSecondWheel = calculateTotalWeight()
 
