@@ -91,13 +91,18 @@ if not IsAddonVisible("WKSLottery") then
     yield("/wait 0.5")
     yield("/interact")
 
-    while not IsAddonVisible("SelectString") do
+    repeat
         yield("/wait 0.5")
-    end
+    until IsAddonVisible("SelectString")
 
     yield("/wait 0.5")
     yield("/callback SelectString true 0")
-    yield("/wait 1")
+
+    repeat
+        yield("/wait 0.5")
+    until IsAddonVisible("SelectString")
+
+    yield("/wait 0.5")
     yield("/callback SelectString true 0")
 end
 
