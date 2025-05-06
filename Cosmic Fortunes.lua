@@ -101,7 +101,7 @@ if not IsAddonVisible("WKSLottery") then
     yield("/callback SelectString true 0")
 end
 
-repeat
+while GetItemCount(45691) >= 1000 do
     local weightFirstWheel, weightSecondWheel = calculateTotalWeight()
 
     if weightFirstWheel > weightSecondWheel then
@@ -138,4 +138,4 @@ repeat
     end
 
     yield("/wait 1")
-until GetItemCount(45691) < 1000
+end
