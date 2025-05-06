@@ -14,7 +14,7 @@ local itemsWanted = {
     ["Cracked Prismaticrystal"] = 0,
     ["Cracked Novacrystal"] = 0,
     ["Echoes in the Distance Orchestri..."] = 0, --Echoes in the Distance Orchestrion Roll
-    ["Close in the Distance (Instrumental) Orchestrion Roll"] = 0,
+    ["Close in the Distance (Instrumen..."] = 0, --Close in the Distance (Instrumental) Orchestrion Roll
     ["Stargazers Orchestrion Roll"] = 0,
     ["Crafter's Delineation"] = 0,
     ["Drafting Table"] = 0,
@@ -24,24 +24,13 @@ local itemsWanted = {
     ["Magicked Prism (Cosmic Explorat..."] = 0 --Magicked Prism (Cosmic Exploration)
 }
 local npc = { name = "Orbitingway", x = 17, y = -1, z = -16 }
-local itemsInFirstWheel = {}
-local itemsInSecondWheel = {}
 
-local function calculateTotalWeight(itemsInWheel)
-    local totalWeight = 0
+local function calculateTotalWeight()
+    local itemsInFirstWheel = {}
+    local itemsInSecondWheel = {}
+    local weightFirstWheel = 0
+    local weightSecondWheel = 0
 
-    for itemName, count in pairs(itemsInWheel) do
-        local itemWeight = itemsWanted[itemName]
-
-        if itemWeight and itemWeight > 0 then
-            totalWeight = totalWeight + (itemWeight * count)
-        end
-    end
-
-    return totalWeight
-end
-
-local function getNames()
     for i = 1, 7 do
         if IsNodeVisible("WKSLottery", 1, 30, 38 - i) then
             local itemName = GetNodeText("WKSLottery", 29 + i, 6)
@@ -63,6 +52,24 @@ local function getNames()
             end
         end
     end
+
+    for itemName, count in pairs(itemsInFirstWheel) do
+        local itemWeight = itemsWanted[itemName]
+
+        if itemWeight and itemWeight > 0 then
+            weightFirstWheel = weightFirstWheel + (itemWeight * count)
+        end
+    end
+
+    for itemName, count in pairs(itemsInSecondWheel) do
+        local itemWeight = itemsWanted[itemName]
+
+        if itemWeight and itemWeight > 0 then
+            weightSecondWheel = weightSecondWheel + (itemWeight * count)
+        end
+    end
+
+    return weightFirstWheel, weightSecondWheel
 end
 
 if not IsAddonVisible("WKSLottery") then
@@ -94,39 +101,41 @@ if not IsAddonVisible("WKSLottery") then
     yield("/callback SelectString true 0")
 end
 
--- while GetItemCount(45691) >= 1000 do
-yield("/wait 1")
+repeat
+    local weightFirstWheel, weightSecondWheel = calculateTotalWeight()
 
-itemsInFirstWheel = {}
-itemsInSecondWheel = {}
+    if weightFirstWheel > weightSecondWheel then
+        yield("First wheel is better with total weight: " .. weightFirstWheel)
+        -- yield("/callback WKSLottery true 1 0")
+        -- yield("/wait 0.1")
+        -- yield("/callback WKSLottery true 0 0")
+    elseif weightSecondWheel > weightFirstWheel then
+        yield("Second wheel is better with total weight: " .. weightSecondWheel)
+        -- yield("/callback WKSLottery true 1 1")
+        -- yield("/wait 0.1")
+        -- yield("/callback WKSLottery true 0 0")
+    else
+        yield("Both wheels are equal in weight.")
+        -- yield("/callback WKSLottery true 0 0")
+        -- yield("/wait 0.1")
+        -- yield("/callback WKSLottery true 1 0")
+    end
 
-getNames()
+    repeat
+        yield("/wait 0.5")
+    until not (IsNodeVisible("WKSLottery", 1, 30) or IsNodeVisible("WKSLottery", 1, 40))
 
-local totalWeightFirstWheel = calculateTotalWeight(itemsInFirstWheel)
-local totalWeightSecondWheel = calculateTotalWeight(itemsInSecondWheel)
-
-yield("/callback WKSLottery true 0 0")
-yield("/wait 1")
-
-if totalWeightFirstWheel > totalWeightSecondWheel then
-    yield("First wheel is better with total weight: " .. totalWeightFirstWheel)
+    yield("/wait 1")
+    yield("/callback WKSLottery true 0 0")
+    yield("/wait 0.1")
     yield("/callback WKSLottery true 1 0")
-elseif totalWeightSecondWheel > totalWeightFirstWheel then
-    yield("Second wheel is better with total weight: " .. totalWeightSecondWheel)
-    yield("/callback WKSLottery true 1 1")
-else
-    yield("Both wheels are equal in weight.")
-    yield("/callback WKSLottery true 1 0")
-end
+    yield("/wait 0.1")
+    yield("/callback WKSLottery true 2 0")
+    yield("/wait 0.5")
 
-yield("/wait 1")
-yield("/callback WKSLottery true 2 0")
-yield("/wait 1")
-yield("/callback WKSLottery true 0 0")
-yield("/wait 1")
-yield("/callback WKSLottery true 1 0")
+    if IsAddonVisible("SelectYesno") then
+        yield("/callback SelectYesno true 0")
+    end
 
-if IsAddonVisible("SelectYesno") then
-    yield("/callback SelectYesno true 0")
-end
--- end
+    yield("/wait 1")
+until GetItemCount(45691) < 1000
