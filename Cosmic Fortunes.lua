@@ -1,8 +1,23 @@
+--=========================================================--
+-- Script Name: Cosmic Fortune Automation
+-- Description: Automates cosmic fortune
+-- Author: Censored
+-- Version: 0.0.10 ?
+-- How to use:
+--  - When done with gathering Luna Credits just start the script.
+--  - If you want to have the script always select the first wheel, set `fullAuto` to true, otherwise you need to select a wheel.
+--  - You can set a minimum for what the script should leave as credits.
+--=========================================================--
+
+--====================== CONFIG ===========================--
+
+local fullAuto = true
+local minimumCreditsLeft = 1000
 local itemsWanted = {
     ["Vacuum Suit Identification Key"] = 200,
-    ["Cosmosuit Coffer"] = 50,
+    ["Ballroom Etiquette - Personal Per..."] = 50, --Ballroom Etiquette - Personal Perfection
+    ["Cosmosuit Coffer"] = 40,
     ["Micro Rover"] = 25,
-    ["Ballroom Etiquette - Personal Per..."] = 25, --Ballroom Etiquette - Personal Perfection
     ["Loparasol"] = 5,
     ["The Faces We Wear - Tinted Sungl..."] = 5,   --The Faces We Wear - Tinted Sunglasses
     ["Verdant Partition"] = 5,
@@ -23,6 +38,10 @@ local itemsWanted = {
     ["Cordial "] = 0,
     ["Magicked Prism (Cosmic Explorat..."] = 0 --Magicked Prism (Cosmic Exploration)
 }
+
+--=========================================================--
+
+--===================== CODE START ========================--
 local npc = { name = "Orbitingway", x = 17, y = -1, z = -16 }
 
 local function calculateTotalWeight()
@@ -120,23 +139,29 @@ while GetItemCount(45691) >= 1000 or IsAddonVisible("WKSLottery") do
 
     yield("/wait 1")
 
-    local weightFirstWheel, weightSecondWheel = calculateTotalWeight()
-
-    if weightFirstWheel > weightSecondWheel then
-        yield("First wheel is better with total weight: " .. weightFirstWheel)
-        -- yield("/callback WKSLottery true 1 0")
-        -- yield("/wait 0.1")
-        -- yield("/callback WKSLottery true 0 0")
-    elseif weightSecondWheel > weightFirstWheel then
-        yield("Second wheel is better with total weight: " .. weightSecondWheel)
-        -- yield("/callback WKSLottery true 1 1")
-        -- yield("/wait 0.1")
-        -- yield("/callback WKSLottery true 0 0")
+    if fullAuto then
+        yield("/callback WKSLottery true 1 0")
+        yield("/wait 0.1")
+        yield("/callback WKSLottery true 0 0")
     else
-        yield("Both wheels are equal in weight.")
-        -- yield("/callback WKSLottery true 0 0")
-        -- yield("/wait 0.1")
-        -- yield("/callback WKSLottery true 1 0")
+        local weightFirstWheel, weightSecondWheel = calculateTotalWeight()
+
+        if weightFirstWheel > weightSecondWheel then
+            yield("First wheel is better with total weight: " .. weightFirstWheel)
+            -- yield("/callback WKSLottery true 1 0")
+            -- yield("/wait 0.1")
+            -- yield("/callback WKSLottery true 0 0")
+        elseif weightSecondWheel > weightFirstWheel then
+            yield("Second wheel is better with total weight: " .. weightSecondWheel)
+            -- yield("/callback WKSLottery true 1 1")
+            -- yield("/wait 0.1")
+            -- yield("/callback WKSLottery true 0 0")
+        else
+            yield("Both wheels are equal in weight.")
+            -- yield("/callback WKSLottery true 0 0")
+            -- yield("/wait 0.1")
+            -- yield("/callback WKSLottery true 1 0")
+        end
     end
 
     repeat
@@ -151,7 +176,13 @@ while GetItemCount(45691) >= 1000 or IsAddonVisible("WKSLottery") do
     yield("/callback WKSLottery true 2 0")
     yield("/wait 0.5")
 
-    if IsAddonVisible("SelectYesno") then
-        yield("/callback SelectYesno true 0")
+    if minimumCreditsLeft >= 1000 and GetItemCount(45691) < minimumCreditsLeft + 1000 then
+        if IsAddonVisible("SelectYesno") then
+            yield("/callback SelectYesno true 1")
+        end
+    else
+        if IsAddonVisible("SelectYesno") then
+            yield("/callback SelectYesno true 0")
+        end
     end
 end
