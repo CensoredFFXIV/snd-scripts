@@ -180,6 +180,8 @@ while GetItemCount(45691) >= 1000 or IsAddonVisible("WKSLottery") do
         if IsAddonVisible("SelectYesno") then
             yield("/callback SelectYesno true 1")
         end
+
+        break
     else
         if IsAddonVisible("SelectYesno") then
             yield("/callback SelectYesno true 0")
