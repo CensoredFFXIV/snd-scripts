@@ -50,13 +50,9 @@ local function calculateTotalWeight()
     local weightFirstWheel = 0
     local weightSecondWheel = 0
 
-    -- yield("------------------------------")
-
     for i = 1, 7 do
         if IsNodeVisible("WKSLottery", 1, 30, 38 - i) then
             local itemName = GetNodeText("WKSLottery", 29 + i, 6)
-
-            -- yield("Wheel 1: " .. itemName)
 
             if itemsInFirstWheel[itemName] then
                 itemsInFirstWheel[itemName] = itemsInFirstWheel[itemName] + 1
@@ -67,8 +63,6 @@ local function calculateTotalWeight()
 
         if IsNodeVisible("WKSLottery", 1, 40, 48 - i) then
             local itemName = GetNodeText("WKSLottery", 19 + i, 6)
-
-            -- yield("Wheel 2: " .. itemName)
 
             if itemsInSecondWheel[itemName] then
                 itemsInSecondWheel[itemName] = itemsInSecondWheel[itemName] + 1
@@ -179,7 +173,10 @@ while GetItemCount(45691) >= 1000 or IsAddonVisible("WKSLottery") do
         yield("/wait 0.5")
     until not (IsNodeVisible("WKSLottery", 1, 30) or IsNodeVisible("WKSLottery", 1, 40))
 
-    yield("/wait 1")
+    if not fullAuto then
+        yield("/wait 1")
+    end
+
     yield("/callback WKSLottery true 0 0")
     yield("/wait 0.1")
     yield("/callback WKSLottery true 1 0")
