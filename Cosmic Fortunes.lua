@@ -2,24 +2,24 @@
 -- Script Name: Cosmic Fortune Automation
 -- Description: Automates cosmic fortune
 -- Author: Censored
--- Version: 0.0.10 ?
+-- Version: 0.0.11 ?
 -- How to use:
 --  - When done with gathering Luna Credits just start the script.
---  - If you want to have the script always select the first wheel, set `fullAuto` to true, otherwise you need to select a wheel.
+--  - If you want to have the script in fullAutomatic mode, set `fullAuto` to true, otherwise you need to select a wheel.
 --  - You can set a minimum for what the script should leave as credits.
 --=========================================================--
 
 --====================== CONFIG ===========================--
 
-local fullAuto = true
-local minimumCreditsLeft = 1000
+local fullAuto = false
+local minimumCreditsLeft = 0
 local itemsWanted = {
     ["Vacuum Suit Identification Key"] = 200,
     ["Ballroom Etiquette - Personal Per..."] = 50, --Ballroom Etiquette - Personal Perfection
     ["Cosmosuit Coffer"] = 40,
     ["Micro Rover"] = 25,
     ["Loparasol"] = 5,
-    ["The Faces We Wear - Tinted Sungl..."] = 5,   --The Faces We Wear - Tinted Sunglasses
+    ["The Faces We Wear - Tinted Sungl..."] = 5, --The Faces We Wear - Tinted Sunglasses
     ["Verdant Partition"] = 5,
     ["Stellar Opportunity"] = 0,
     ["Metallic Cobalt Green Dye"] = 0,
@@ -50,9 +50,13 @@ local function calculateTotalWeight()
     local weightFirstWheel = 0
     local weightSecondWheel = 0
 
+    -- yield("------------------------------")
+
     for i = 1, 7 do
         if IsNodeVisible("WKSLottery", 1, 30, 38 - i) then
             local itemName = GetNodeText("WKSLottery", 29 + i, 6)
+
+            -- yield("Wheel 1: " .. itemName)
 
             if itemsInFirstWheel[itemName] then
                 itemsInFirstWheel[itemName] = itemsInFirstWheel[itemName] + 1
@@ -63,6 +67,8 @@ local function calculateTotalWeight()
 
         if IsNodeVisible("WKSLottery", 1, 40, 48 - i) then
             local itemName = GetNodeText("WKSLottery", 19 + i, 6)
+
+            -- yield("Wheel 2: " .. itemName)
 
             if itemsInSecondWheel[itemName] then
                 itemsInSecondWheel[itemName] = itemsInSecondWheel[itemName] + 1
@@ -137,30 +143,35 @@ while GetItemCount(45691) >= 1000 or IsAddonVisible("WKSLottery") do
         yield("/wait 0.5")
     until IsNodeVisible("WKSLottery", 1, 30) and IsNodeVisible("WKSLottery", 1, 40)
 
-    yield("/wait 1")
+    if not fullAuto then
+        yield("/wait 1")
+    end
 
-    if fullAuto then
-        yield("/callback WKSLottery true 1 0")
-        yield("/wait 0.1")
-        yield("/callback WKSLottery true 0 0")
+    local weightFirstWheel, weightSecondWheel = calculateTotalWeight()
+
+    if weightFirstWheel > weightSecondWheel then
+        yield("First wheel is better with total weight: " .. weightFirstWheel)
+
+        if fullAuto then
+            yield("/callback WKSLottery true 0 0")
+            yield("/wait 0.1")
+            yield("/callback WKSLottery true 1 0")
+        end
+    elseif weightSecondWheel > weightFirstWheel then
+        yield("Second wheel is better with total weight: " .. weightSecondWheel)
+
+        if fullAuto then
+            yield("/callback WKSLottery true 0 1")
+            yield("/wait 0.1")
+            yield("/callback WKSLottery true 1 0")
+        end
     else
-        local weightFirstWheel, weightSecondWheel = calculateTotalWeight()
+        yield("Both wheels are equal in weight.")
 
-        if weightFirstWheel > weightSecondWheel then
-            yield("First wheel is better with total weight: " .. weightFirstWheel)
-            -- yield("/callback WKSLottery true 1 0")
-            -- yield("/wait 0.1")
-            -- yield("/callback WKSLottery true 0 0")
-        elseif weightSecondWheel > weightFirstWheel then
-            yield("Second wheel is better with total weight: " .. weightSecondWheel)
-            -- yield("/callback WKSLottery true 1 1")
-            -- yield("/wait 0.1")
-            -- yield("/callback WKSLottery true 0 0")
-        else
-            yield("Both wheels are equal in weight.")
-            -- yield("/callback WKSLottery true 0 0")
-            -- yield("/wait 0.1")
-            -- yield("/callback WKSLottery true 1 0")
+        if fullAuto then
+            yield("/callback WKSLottery true 0 0")
+            yield("/wait 0.1")
+            yield("/callback WKSLottery true 1 0")
         end
     end
 
