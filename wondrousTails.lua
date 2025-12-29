@@ -104,7 +104,7 @@ local wonderousTailsDuties = {
         -- { dutyName="AAC Light-heavyweight M3 or M4", dutyId=1229, minLevel=100 }
     },
     {                                                                                            -- type 5: leveling dungeons
-        { dutyName = "Leveling Dungeons (Lv. 1-49)",              dutyId = 172, minLevel = 15 }, --The Aurum Vale
+        { dutyName = "Leveling Dungeons (Lv. 1-49)",              dutyId = 1331, minLevel = 15 }, --The Aurum Vale
         { dutyName = "Leveling Dungeons (Lv. 51-59/61-69/71-79)", dutyId = 434, minLevel = 51 }, --The Dusk Vigil
         { dutyName = "Leveling Dungeons (Lv. 81-89/91-99)",       dutyId = 952, minLevel = 81 }, --The Tower of Zot
     },
